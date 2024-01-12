@@ -1,0 +1,20 @@
+name: Download and Commit
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Run Bash Script
+      env:
+        API_KEY: ${{ secrets.API_KEY }}
+      run: |
+        ./tgdb_devpubgen.sh
