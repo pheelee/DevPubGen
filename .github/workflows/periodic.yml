@@ -1,9 +1,7 @@
 name: Download and Commit
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: 
   schedule:
     - cron: '0 0 * * 0'  # Run every Sunday at midnight (UTC)
 
@@ -15,6 +13,12 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v5
 
+    - name: get reduced database dump for ci integration
+      run: |
+        set -euo pipefail
+        wget -q -O - https://cdn.thegamesdb.net/json/database-latest.json |
+        jq -c '.data.games |= map(select(.platform == 4)) | .data.games |= .[0:5] | .data.count = (.data.games | length) | .include.boxart.data |= with_entries(select(.key | IN("1260", "1726","1727","1728","2305")))' > database-reduced.json
+        
     - name: Run Bash Script
       env:
         API_KEY: ${{ secrets.API_KEY }}
